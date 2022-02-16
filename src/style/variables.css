@@ -1,0 +1,21 @@
+:root {
+    /* fonts */
+    --main-font: 'MedievalSharp', regular;
+    --second-font: 'Montserrat', sans-serif;
+
+    /* colors */
+    --background: #19370F;
+    --light: white;
+    --main-color: #F3C243;
+    --dark: black;
+    --dark-light: #676767;
+
+    /* gaps */
+    --gap-small: 10px;
+    --gap-medium: 20px;
+    --gap-large: 40px;
+
+    /* radius */
+    --corner-radius: 4px;
+
+}
