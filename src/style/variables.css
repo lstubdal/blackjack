@@ -1,21 +1,22 @@
 :root {
-    /* fonts */
+    /* font */
     --main-font: 'MedievalSharp', regular;
     --second-font: 'Montserrat', sans-serif;
 
-    /* colors */
+    /* color */
     --background: #19370F;
     --light: white;
     --main-color: #F3C243;
     --dark: black;
     --dark-light: #676767;
 
-    /* gaps */
+    /* padding */
     --small: 10px;
     --medium: 30px;
     --large: 50px;
+    --extra-large: 125px;
 
-    /* margins */
+    /* margin */
     --side-margin: 70px;
     --top-large: 100px;
 

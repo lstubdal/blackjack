@@ -1,11 +1,14 @@
 <template>
     <div class="table">
-        <img src="/images/exit.svg" alt="exit" class="table__exit">
+        <RouterLink :to="{ name: 'home'}">
+            <img src="/images/exit.svg" alt="exit" class="table__exit">
+        </RouterLink>
+
         <h2 class="table__participants table__participants--dealer">{{ participants[0] }}</h2>
 
         <div class="dealer">
-            <div class="dealer__cards">
-                dealer cards
+            <div v-for="card in dealersCards">
+                <img :src="card.image" :alt="card.code" class="table__card">
             </div>
         </div>
 
@@ -19,15 +22,16 @@
         <h2 class="table__participants table__participants--you">{{ participants[1] }}</h2>
 
         <div class="player">
-            <div class="player__cards">
-                player cards
-            </div>
-
-            <div class="player__buttons">
-                <button class="player__button">{{ buttonText[0] }}</button>
-                <button class="player__button">{{ buttonText[1] }}</button>
+            <div class="player__cards" v-for="card in playersCards">
+                <img :src="card.image" :alt="card.code" class="table__card">
             </div>
         </div>
+
+         <div class="table__buttons">
+                <button class="table__button">{{ buttonText[0] }}</button>
+                <button class="table__button">{{ buttonText[1] }}</button>
+        </div>
+
     </div>
 </template>
 
@@ -37,12 +41,51 @@
             return {
                 participants: ['DEALER', 'YOU'],
                 buttonText: ['HIT ME', 'STAY'],
-                gameStatus: ['No one has Black Jack', 'Dealers turn...']
+                gameStatus: ['No one has Black Jack', 'Dealers turn...'],
+                deckId: '',
+                dealersCards: [],
+                playersCards: [],
+                remainingCards: ''
             }
         },
 
+        created() {
+            this.setUpTable();
+        },
+
         methods: {
-            
+            async setUpTable() {
+
+                /* fetch a new deck of cards with unique id */
+                const url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
+                const response = await fetch(url);
+                const { deck_id } = await response.json();
+
+                this.deckId = deck_id;
+
+                /* draw four cards from deck for default table */
+                const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=4`;
+                const drawResponse = await fetch(drawUrl);
+                const data = await drawResponse.json();
+
+                console.log('kort igjen', data.remaining);
+                console.log('cards', data.cards);
+
+                this.dealersCards.push(data.cards[0]);
+                this.dealersCards.push(data.cards[1]);
+                console.log('DEALERS KORT', this.dealersCards.length);
+
+                this.playersCards.push(data.cards[2]);
+                this.playersCards.push(data.cards[3]);
+                console.log('PLAYER KORT', this.dealersCards.length);
+            },
+
+            exit() {
+                // reset game
+                //get a new deck of cards
+                // reset deckId variable
+                // reset players cards arrays
+            }
         }
     }
 </script>
@@ -51,8 +94,8 @@
     .table {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
+        justify-content: center;
+        align-items: center; 
         height: 100vh;
         width: 100vw;
     }
@@ -104,22 +147,31 @@
         font-family: var(--second-font);
         font-size: 0.4em;
     }
-    
+
+    .dealer, .player {
+        display: flex;
+    }
+
     .table__status {
+        position: absolute;
         font-size: 2.5em;
         font-family: var(--second-font);
         color: var(--light);
+        padding-bottom: var(--extra-large);
     }
 
-    .player__cards {
-        text-align: center;
+    .table__card {
+        padding: var(--small);
+        height: 65%;
     }
 
-    .player__buttons {
+    .table__buttons {
+        position: absolute;
+        bottom: 40;
         margin-top: var(--top-large);
     }
 
-    .player__button {
+    .table__button {
         width: 225px;
         height: 60px;
         padding: var(--small);
@@ -129,10 +181,10 @@
         border-radius: var(--corner-radius);
         background-color: var(--main-color);
         border: none;
-        margin: 0px var(--medium);
+        margin: 0px var(--small);
     }
     
-    .player__button:hover {
+    .table__button:hover {
         color: var(--light);
         background-color: var(--dark);
     } 
