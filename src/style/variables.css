@@ -11,9 +11,13 @@
     --dark-light: #676767;
 
     /* gaps */
-    --gap-small: 10px;
-    --gap-medium: 20px;
-    --gap-large: 40px;
+    --small: 10px;
+    --medium: 30px;
+    --large: 50px;
+
+    /* margins */
+    --side-margin: 70px;
+    --top-large: 100px;
 
     /* radius */
     --corner-radius: 4px;
