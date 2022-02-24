@@ -1,0 +1,11 @@
+To Do:
+- pick card
+- stay
+- turn dealers first card around => stay from player then turn
+- hover over exit => write exit
+- !gameFinished = true => layover w. delay
+
+
+EXTRA FEATURES
+- add several players
+- add scoreboard

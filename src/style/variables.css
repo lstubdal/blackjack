@@ -17,10 +17,11 @@
     --extra-large: 125px;
 
     /* margin */
-    --side-margin: 70px;
+    --side-margin: 75px;
     --top-large: 100px;
+    --top-small: 10px;
 
     /* radius */
-    --corner-radius: 4px;
+    --corner-radius: 5px;
 
 }
