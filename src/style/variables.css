@@ -3,6 +3,9 @@
     --main-font: 'MedievalSharp', regular;
     --second-font: 'Montserrat', sans-serif;
 
+    /* size */
+    --button-size: 1.7em;
+
     /* color */
     --background: #19370F;
     --light: white;
