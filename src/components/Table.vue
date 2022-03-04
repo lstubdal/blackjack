@@ -91,7 +91,6 @@
 
                 } else { /* check if anyone is busted */
                     if (this.totalSum(this.dealersCards) > 21 ) {
-                        this.playerDone = !this.playerDone;
                        this.gameFinished = !this.gameFinished;
                        return this.gameStatus = 'Dealer is busted, you win!';
 
@@ -111,6 +110,14 @@
 
                 return this.gameStatus = 'None has Black Jack yet';
             },
+
+            getDealersTotalSum() {
+                return this.dealersTotalSum;
+            },
+
+            getPlayersTotalSum() {
+                return this.playersTotalSum;
+            }
         },
 
         methods: {
@@ -143,24 +150,21 @@
                 this.playerDone = !this.playerDone;     /* stay button clicked from player aka player is done  */
                 console.log('før loop' , this.playerDone);
                 console.log('POENG før LOOP', this.totalSum(this.dealersCards))
-               if (this.playerDone ) {
-                   while (this.totalSum(this.dealersCards) < 17 ) {
-                    console.log('stauts i loop', this.playerDone);
-                    console.log('POENG LOOP', this.totalSum(this.dealersCards))
+                
+                if (this.playerDone ) {
+                    while (this.totalSum(this.dealersCards) < 17 ) {
+                       this.totalSum(this.dealersCards)                 /* call on function to update sum  */
+                       console.log('stauts i loop', this.playerDone);
+                       console.log('POENG LOOP', this.totalSum(this.dealersCards));
+                       
+                       const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
+                       const drawResponse =  await fetch(drawUrl);
+                       const cardData = await drawResponse.json();
 
-                    const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
-                    const drawResponse =  await fetch(drawUrl);
-                    const cardData = await drawResponse.json();
-
-                    this.remainingCards = cardData.remaining;       /* update */
-                    
-                     setTimeout( () => {
-                        this.dealersCards.push(cardData.cards[0]);
-                    }, 2000) 
-                }  
-               }
-               
-                 
+                       this.dealersCards.push(cardData.cards[0]);
+                       this.remainingCards = cardData.remaining;       /* update */
+                    }  
+               }     
             },
 
             async drawCardPlayer() {
@@ -182,7 +186,6 @@
 
             totalSum(cardList) { 
                 let totalSum = 0;
-
                 cardList.forEach(card => {
                     if (card.value === 'JACK' || card.value === 'QUEEN' || card.value === 'KING') {
                         totalSum += 10
@@ -194,14 +197,12 @@
                     }
                 })
 
+                /* update correct total sum */
                 if (cardList === this.dealersCards) {
-                     return totalSum += this.dealersTotalSum;
-                     console.log('total sum', totalSum);
-                     console.log('dealers sum', this.dealersTotalSum);
-
+                    return totalSum;
                 } else {
                     if (cardList === this.playersCards){
-                        return totalSum += this.playersTotalSum;
+                        return totalSum;
                     }
                 }
             },
