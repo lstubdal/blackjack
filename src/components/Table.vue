@@ -15,9 +15,9 @@
         </h2>
 
         <div class="dealer">
-            <div v-if="playerDone" class="dealer__first-card">dealers hidden card</div>
+            <div v-if="!playerDone" class="dealer__first-card">dealers hidden card</div>
             <div class="dealer__cards"  v-for="(card, index) in dealersCards">
-                <img v-if="!playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
+                <img v-if="playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
                 <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">    <!-- kanskje??? :class="`dealer__card + index ${playerDone && index === 0 ? 'dealer__first-card' : ''}`" -->
             </div>
         </div>
@@ -40,8 +40,8 @@
         </div>
 
         <div class="table__buttons">
-            <button class="table__button" @click="drawCardPlayer">{{ buttonText[0] }}</button>
-            <button class="table__button" @click="showDealersCard">{{ buttonText[1] }}</button>
+            <button class="table__button" @click="drawCardPlayer">HIT ME</button>
+            <button class="table__button" @click="showDealersCard">STAY</button>
         </div>
 
     </div>
@@ -53,15 +53,11 @@
         data() {
             return {
                 participants: ['DEALER', 'YOU'],
-                buttonText: ['HIT ME', 'STAY'],
                 gameStatus: '',
                 deckId: '',
                 dealersCards: [],
                 playersCards: [],
-                /* dealersSum: 0,
-                playersSum: 0, */
                 remainingCards: '',
-                blackjack: 21,
                 gameFinished: false,
                 playerDone: false,
                 dealerDrawsCard: false
@@ -78,27 +74,34 @@
             },
 
             getStatusOfGame() {
-                
-                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
-                    this.playerDone = !this.playerDone;
+                /* check if anyone has black jack  */
+               if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
+                    /* this.playerDone = !this.playerDone; */
                     return this.gameStatus = 'BLACK JACK! Dealer wins...';
                 
                 } else if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21 ) {
-                    this.playerDone = !this.playerDone;
-                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
+                    /* this.playerDone = !this.playerDone; */
+                    return this.gameStatus = 'BLACK JACK! Congrats, you win';
 
                 } else if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) === 21) {
-                    this.playerDone = !this.playerDone;
+                    /* this.playerDone = !this.playerDone; */
                     return this.gameStatus = 'BLACK JACK! Both have 21, but dealer still wins...';
 
                 } else {
-                    return this.gameStatus = 'None has Black Jack yet';
-                }
-            },
+                    /* check if anyone is busted */
+                    if (this.totalSum(this.dealersCards) > 21 ) {
+                       /*  this.playerDone = !this.playerDone; */
+                        return this.gameStatus = 'Dealer is busted, you win!';
 
-            /* check status of default tabole */
-            defaultTable() {
-                
+                    }  else {
+                        if (this.totalSum(this.playersCards) > 21  ) {
+                           /*  this.playerDone = !this.playerDone; */
+                            return this.gameStatus = "You're busted, dealer wins...";
+                        }
+                    }
+                }
+
+                return this.gameStatus = 'None has Black Jack yet';
             },
         },
 
@@ -129,21 +132,24 @@
             },
 
             async drawCardDealer() {
-                
-            /* when player stays, make dealer draw card while sum is under 17 */
-                while (this.dealersTotalSum < 17 && this.playerDone ) {
+                this.playerDone = !this.playerDone;
+            /* when player stays, make dealer draw card if sum is under 17 */
+                console.log('clicked');
+                console.log('status før loop', this.playerDone);
+                if (this.totalSum(this.dealersCards) < 17 && this.playerDone ) {
+                    console.log('stauts i loop', this.playerDone);
+
                     const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
                     const drawResponse =  await fetch(drawUrl);
                     const cardData = await drawResponse.json();
                     
+                    this.remainingCards = cardData.remaining;       /* update */
+                    
                      setTimeout( () => {
                         this.dealersCards.push(cardData.cards[0]);
-                        this.remainingCards = cardData.remaining;       /* update */
                     }, 2000) 
-                    
-                    this.dealersSum = 0;    /* reset sum for each time player draws a card */
 
-                    console.log('etter push ', this.dealersCards.length);
+ 
 
                 }        
             },
@@ -153,18 +159,15 @@
                 const drawResponse = await fetch(drawUrl);
                 const cardData = await drawResponse.json();
                 
-                console.log('før push ', this.playersCards.length);
+        
                 this.playersCards.push(cardData.cards[0]);
-                this.playersSum = 0;    /* reset sum for each time player draws a card */
-                console.log('etter push ', this.playersCards.length);
+       
 
                 this.remainingCards = cardData.remaining;       /* update */
             },
 
             showDealersCard() {
-                this.drawCardDealer();
-                this.dealerFinished();
-                
+                this.drawCardDealer();                
             },
 
 
@@ -181,7 +184,7 @@
                         totalSum += valueAsNumer;
                     }
                 })
-                console.log('totalSum', totalSum)
+
                 return totalSum;
             },
 
