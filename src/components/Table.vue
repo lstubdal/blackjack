@@ -40,8 +40,8 @@
         </div>
 
         <div class="table__buttons">
-            <button class="table__button" @click="drawCardPlayer">HIT ME</button>
-            <button class="table__button" @click="showDealersCard">STAY</button>
+            <button class="table__button" @click="drawCard(playersCards)">HIT ME</button>
+            <button class="table__button" @click="dealersTurn">STAY</button>
         </div>
 
     </div>
@@ -146,7 +146,7 @@
                 this.remainingCards = data.remaining;
             },
 
-            async drawCardDealer() {
+            async dealersTurn() {
                 this.playerDone = !this.playerDone;     /* stay button clicked from player aka player is done  */
                 console.log('før loop' , this.playerDone);
                 console.log('POENG før LOOP', this.totalSum(this.dealersCards))
@@ -154,33 +154,36 @@
                 if (this.playerDone ) {
                     while (this.totalSum(this.dealersCards) < 17 ) {
                        this.totalSum(this.dealersCards)                 /* call on function to update sum  */
+                       
                        console.log('stauts i loop', this.playerDone);
                        console.log('POENG LOOP', this.totalSum(this.dealersCards));
                        
-                       const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
-                       const drawResponse =  await fetch(drawUrl);
-                       const cardData = await drawResponse.json();
+                       this.gameStatus = 'Dealer trekker kort';
+                       await this.drawCard(this.dealersCards);
+                       this.gameStatus = 'Dealer trekker har trukket kort';
+                       
 
-                       this.dealersCards.push(cardData.cards[0]);
-                       this.remainingCards = cardData.remaining;       /* update */
-                    }  
+                        console.log('dealer ferdig');
+                    }
                }     
             },
 
-            async drawCardPlayer() {
+            async drawCard(cardList) {
                 const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
                 const drawResponse = await fetch(drawUrl);
                 const cardData = await drawResponse.json();
                 
-        
-                this.playersCards.push(cardData.cards[0]);
-       
-
-                this.remainingCards = cardData.remaining;       /* update */
-            },
-
-            showDealersCard() {
-                this.drawCardDealer();                
+                /* add card to correct list */
+                if (cardList === this.dealersCards) {
+                    this.dealersCards.push(cardData.cards[0]);
+                    console.log('dealer trekker kort')
+                } else {
+                    if (cardList === this.playersCards) {
+                        this.playersCards.push(cardData.cards[0]);
+                        console.log('spiller trekker kort');
+                    }
+                }
+                this.remainingCards = cardData.remaining;       /* update remaining cards in stack*/
             },
 
 
