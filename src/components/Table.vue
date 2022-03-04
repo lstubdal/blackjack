@@ -1,10 +1,10 @@
 <template>
     <div class="table"> <!-- semantikk -->
-        <div class="table__game-finished" v-if="gameFinished">
+        <!-- <div class="table__game-finished" v-if="gameFinished">
             <RouterLink :to="{ name: 'home'}">
                 <button>PLAY AGAIN</button>
             </RouterLink>
-        </div>
+        </div> -->
 
         <RouterLink :to="{ name: 'home'}">
             <img src="/images/exit.svg" alt="exit" class="table__exit">
@@ -57,6 +57,8 @@
                 deckId: '',
                 dealersCards: [],
                 playersCards: [],
+                dealersTotalSum: 0,
+                playersTotalSum: 0,
                 remainingCards: '',
                 gameFinished: false,
                 playerDone: false,
@@ -76,29 +78,35 @@
             getStatusOfGame() {
                 /* check if anyone has black jack  */
                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
-                    /* this.playerDone = !this.playerDone; */
+                    this.playerDone = !this.playerDone;
                     return this.gameStatus = 'BLACK JACK! Dealer wins...';
                 
                 } else if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21 ) {
-                    /* this.playerDone = !this.playerDone; */
+                    this.playerDone = !this.playerDone;
                     return this.gameStatus = 'BLACK JACK! Congrats, you win';
 
                 } else if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) === 21) {
-                    /* this.playerDone = !this.playerDone; */
+                    this.playerDone = !this.playerDone;
                     return this.gameStatus = 'BLACK JACK! Both have 21, but dealer still wins...';
 
-                } else {
-                    /* check if anyone is busted */
+                } else { /* check if anyone is busted */
                     if (this.totalSum(this.dealersCards) > 21 ) {
-                       /*  this.playerDone = !this.playerDone; */
-                        return this.gameStatus = 'Dealer is busted, you win!';
+                        this.playerDone = !this.playerDone;
+                       this.gameFinished = !this.gameFinished;
+                       return this.gameStatus = 'Dealer is busted, you win!';
 
                     }  else {
                         if (this.totalSum(this.playersCards) > 21  ) {
-                           /*  this.playerDone = !this.playerDone; */
-                            return this.gameStatus = "You're busted, dealer wins...";
+                            this.playerDone = !this.playerDone;
+                           this.gameFinished = !this.gameFinished;
+                           return this.gameStatus = "You're busted, dealer wins...";
                         }
                     }
+                }
+
+                /* check winner when no one has blackjack or busted */
+                if (this.playerDone && this.totalSum(this.dealersCards) < 21 && this.totalSum(this.playersCards) < 21) {
+                    return this.totalSum(this.dealersCards) > this.totalSum(this.playersCards) ? this.gameStatus = 'Dealer is closest to 21 and wins!' : this.gameStatus = 'You are closest to 21 and wins!';
                 }
 
                 return this.gameStatus = 'None has Black Jack yet';
@@ -132,26 +140,27 @@
             },
 
             async drawCardDealer() {
-                this.playerDone = !this.playerDone;
-            /* when player stays, make dealer draw card if sum is under 17 */
-                console.log('clicked');
-                console.log('status før loop', this.playerDone);
-                if (this.totalSum(this.dealersCards) < 17 && this.playerDone ) {
+                this.playerDone = !this.playerDone;     /* stay button clicked from player aka player is done  */
+                console.log('før loop' , this.playerDone);
+                console.log('POENG før LOOP', this.totalSum(this.dealersCards))
+               if (this.playerDone ) {
+                   while (this.totalSum(this.dealersCards) < 17 ) {
                     console.log('stauts i loop', this.playerDone);
+                    console.log('POENG LOOP', this.totalSum(this.dealersCards))
 
                     const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
                     const drawResponse =  await fetch(drawUrl);
                     const cardData = await drawResponse.json();
-                    
+
                     this.remainingCards = cardData.remaining;       /* update */
                     
                      setTimeout( () => {
                         this.dealersCards.push(cardData.cards[0]);
                     }, 2000) 
-
- 
-
-                }        
+                }  
+               }
+               
+                 
             },
 
             async drawCardPlayer() {
@@ -180,12 +189,21 @@
                     } else if (card.value === 'ACE' && cardList.length >= 2) {
                         totalSum += 11
                     } else {
-                        const valueAsNumer = parseInt(card.value);
+                        const valueAsNumer = parseInt(card.value);  /* parse value from API to number in order to add sum */
                         totalSum += valueAsNumer;
                     }
                 })
 
-                return totalSum;
+                if (cardList === this.dealersCards) {
+                     return totalSum += this.dealersTotalSum;
+                     console.log('total sum', totalSum);
+                     console.log('dealers sum', this.dealersTotalSum);
+
+                } else {
+                    if (cardList === this.playersCards){
+                        return totalSum += this.playersTotalSum;
+                    }
+                }
             },
 
             exit() {
