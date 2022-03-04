@@ -11,7 +11,7 @@
         </RouterLink>
 
         <h2 class="table__participants table__participants--dealer">{{ participants[0] }} 
-            <div v-if="!playerDone" class="table__sum">Sum: {{ dealersTotalSum }}</div>       <!-- show dealers sum if player hit stay -->
+            <div  class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> <!-- v-if="!playerDone" -->
         </h2>
 
         <div class="dealer">
@@ -30,7 +30,7 @@
         <div class="table__status">{{ getStatusOfGame }}</div>
 
         <h2 class="table__participants table__participants--you">{{ participants[1] }}
-            <div class="table__sum">Sum: {{ playersTotalSum }}</div>
+            <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
         </h2>
 
         <div class="player">    <!-- section -->
@@ -40,8 +40,8 @@
         </div>
 
         <div class="table__buttons">
-                <button class="table__button" @click="drawCardPlayer">{{ buttonText[0] }}</button>
-                <button class="table__button" @click="showDealersCard">{{ buttonText[1] }}</button>
+            <button class="table__button" @click="drawCardPlayer">{{ buttonText[0] }}</button>
+            <button class="table__button" @click="showDealersCard">{{ buttonText[1] }}</button>
         </div>
 
     </div>
@@ -54,17 +54,16 @@
             return {
                 participants: ['DEALER', 'YOU'],
                 buttonText: ['HIT ME', 'STAY'],
-                gameStatusMessage: ['No one has Black Jack', 'Black Jack! Dealer wins', 'Black Jack! You win', "Dealer's busted, you win!", "You're busted, dealer wins", 'Dealer draws a card'],
                 gameStatus: '',
                 deckId: '',
                 dealersCards: [],
                 playersCards: [],
-                dealersSum: 0,
-                playersSum: 0,
+                /* dealersSum: 0,
+                playersSum: 0, */
                 remainingCards: '',
                 blackjack: 21,
                 gameFinished: false,
-                playerDone: true,
+                playerDone: false,
                 dealerDrawsCard: false
             }
         },
@@ -78,87 +77,28 @@
                 return this.dealersDrawsCard = !this.dealerDrawsCard
             },
 
-            dealerFinished() {
-                this.playerDone = !this.playerDone;
-            },
-
             getStatusOfGame() {
-                /* check default table status */
-       
-                    if (this.dealersTotalSum != this.blackjack && this.playersTotalSum != this.blackjack){ /* if neither have black jack */
-                        return this.gameStatusMessage[0];
-                    }
-
-                    if (this.dealersTotalSum === this.blackjack && this.playersTotalSum != this.blackjack){ /* if dealer has blackjack */
-                        this.gameFinished = !this.gameFinished;
-                        this.dealerFinished();
-                        return this.gameStatusMessage[1]
-
-                    } else if (this.dealersTotalSum === this.blackjack && this.playersTotalSum === this.blackjack){  /* if both has blackjack, dealer also wins */
-                        this.gameFinished = true;
-                        this.dealerFinished();
-                        return this.gameStatusMessage[1]
-                    }
-
-                    if (this.dealersTotalSum != this.blackjack && this.playersTotalSum === this.blackjack){ /* if player has black jack */
-                        this.dealerFinished();
-                        return this.gameStatusMessage[2];
-                    }
-
-                /* check if dealer or player are busted */
-                    if (this.dealersSum > this.blackjack ) {
-                        this.dealerFinished();
-                        return this. gameStatusMessage[3];
-                       
-                    } else {
-                        if (this.playersSum > this.blackjack ) {
-                            return this.gameStatusMessage[4];
-                        }
-                    }
                 
+                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
+                    this.playerDone = !this.playerDone;
+                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
+                
+                } else if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21 ) {
+                    this.playerDone = !this.playerDone;
+                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
 
-                /* check who wins when no one has  */
-                if (this.dealersSum >= 17 && this.dealersSum > this.playersSum) {
-                    this.dealerFinished();
-                    return this.gameStatusMessage[1]
-                }
+                } else if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) === 21) {
+                    this.playerDone = !this.playerDone;
+                    return this.gameStatus = 'BLACK JACK! Both have 21, but dealer still wins...';
 
-                if (this.dealerDrawsCard) {
-                    return this.gameStatusMessage[6];
+                } else {
+                    return this.gameStatus = 'None has Black Jack yet';
                 }
             },
 
-
-            dealersTotalSum() { /* SHOW AFTER PLAYER STAYS */
-                this.dealersCards.forEach(card => {
-                    if (card.value === 'JACK' || card.value === 'QUEEN' || card.value === 'KING') {
-                        this.dealersSum += 10
-                    } else if (card.value === 'ACE' && this.dealersCards.length >= 2) {
-                        this.dealersSum += 11
-                    } else {
-                        const valueAsNumer = parseInt(card.value);
-                        this.dealersSum += valueAsNumer;
-                    }
-                })
-                console.log('dealer', this.dealersSum)
-                return this.dealersSum;
-            },
-
-            playersTotalSum() {
-                console.log('player sum først', this.playersSum);
+            /* check status of default tabole */
+            defaultTable() {
                 
-                this.playersCards.forEach(card => {
-                    if (card.value === 'JACK' || card.value === 'QUEEN' || card.value === 'KING') {
-                        this.playersSum += 10;
-                    } else if (card.value === 'ACE' && this.playersCards.length >= 2) {
-                            this.playersSum += 11
-                    } else {
-                        const valueAsNumer = parseInt(card.value);
-                        this.playersSum += valueAsNumer;
-                    }
-                })
-                console.log('player', this.playersSum)
-                return this.playersSum;
             },
         },
 
@@ -227,6 +167,23 @@
                 
             },
 
+
+            totalSum(cardList) { 
+                let totalSum = 0;
+
+                cardList.forEach(card => {
+                    if (card.value === 'JACK' || card.value === 'QUEEN' || card.value === 'KING') {
+                        totalSum += 10
+                    } else if (card.value === 'ACE' && cardList.length >= 2) {
+                        totalSum += 11
+                    } else {
+                        const valueAsNumer = parseInt(card.value);
+                        totalSum += valueAsNumer;
+                    }
+                })
+                console.log('totalSum', totalSum)
+                return totalSum;
+            },
 
             exit() {
                 // reset game
@@ -374,7 +331,7 @@
         color: var(--light);
         background-color: var(--dark);
     } 
-</style>
+
 
     .table__button {
         width: 225px;
