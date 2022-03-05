@@ -1,6 +1,6 @@
 <template>
     <div class="table"> 
-        <div class="table__game-finished" v-if="gameFinished">
+        <div class="table__game-finished" v-if="gameDone">
             <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
             <RouterLink :to="{ name: 'home'}">
                 <button class="table__game-finished-button">PLAY AGAIN</button>
@@ -61,7 +61,7 @@
                 dealersTotalSum: 0,
                 playersTotalSum: 0,
                 remainingCards: '',
-                gameFinished: false,
+                gameDone: false,
                 playerDone: false,
             }
         },
@@ -72,33 +72,49 @@
 
         computed: {
             getStatusOfGame() {
-                /* check if anyone has black jack  */
+                /* check blackjack by default */
+                if (this.dealersCards.length === 2 && this.dealersCards.length === 2) {
+                    if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
+                    this.playerFinished();
+                    this.gameFinished();
+                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
+
+                    } else {
+                        if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21) {
+                        this.playerFinished();
+                        this.gameFinished();
+                        return this.gameStatus = 'BLACK JACK! Congrats, you win';
+                        }
+                    }
+                } 
+
+                /* check black jack  */
                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
-                    this.playerDone = !this.playerDone;
-                    this.gameFinished = !this.gameFinished;
+                    this.playerFinished();
+                    this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Dealer wins...';
                 
                 } else if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21 ) {
-                    this.playerDone = !this.playerDone;
-                    this.gameFinished = !this.gameFinished;
+                    this.playerFinished();
+                    this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Congrats, you win';
 
                 } else if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) === 21) {
-                    this.playerDone = !this.playerDone;
-                    this.gameFinished = !this.gameFinished;
+                    this.playerFinished();
+                    this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Both have 21, but dealer still wins...';
 
                 } else { /* check if anyone is busted */
                     if (this.totalSum(this.dealersCards) > 21 ) {
-                       this.gameFinished = !this.gameFinished;
-                       this.gameFinished = !this.gameFinished;
+                       this.playerFinished();
+                       this.gameFinished(); 
                        return this.gameStatus = 'Dealer is busted, you win!';
-
+                       
                     }  else {
                         if (this.totalSum(this.playersCards) > 21  ) {
-                            this.playerDone = !this.playerDone;
-                            this.gameFinished = !this.gameFinished;
-                           return this.gameStatus = "You're busted, dealer wins...";
+                            this.playerFinished();
+                            this.gameFinished();
+                            return this.gameStatus = "You're busted, dealer wins...";
                         }
                     }
                 }
@@ -106,15 +122,15 @@
                 /* check winner when no one has blackjack or busted */
                 if (this.playerDone && this.totalSum(this.dealersCards) < 21 && this.totalSum(this.playersCards) < 21) {
                     if (this.totalSum(this.dealersCards) > this.totalSum(this.playersCards)) {
-                        this.gameFinished = !this.gameFinished;
+                        this.gameFinished();
                         return this.gameStatus = 'Dealer is closest to 21 and wins!';
                     } else {
-                        this.gameFinished = !this.gameFinished;
-                        return this.gameStatus = 'You are closest to 21 and wins!'
+                        this.gameFinished();
+                        return this.gameStatus = 'Congrats, you are closest to 21 and wins!';
                     }
                 }
 
-                return this.gameStatus = 'None has Black Jack yet';
+                return this.gameStatus = 'None has Black Jack yet'; 
             },
         },
 
@@ -163,7 +179,7 @@
             },
 
             async dealersTurn() {
-                this.playerDone = !this.playerDone;     /* stay button clicked from player aka player is done  */
+                this.playerFinished();
 
                 if (this.playerDone ) {
                     while (this.totalSum(this.dealersCards) < 17 ) {
@@ -198,6 +214,22 @@
                         return totalSum;
                     }
                 }
+            },
+
+            updateGameStatus(newUpdate) {
+                this.gameStatus = newUpdate;
+            },
+
+            playerFinished() {
+                setTimeout(() => {
+                    this.playerDone = !this.playerDone; 
+                }, 1000);
+            },
+
+            gameFinished() {
+                setTimeout(() => {
+                    this.gameDone = !this.gameDone; 
+                }, 1000);
             },
 
             newGame() {
@@ -314,14 +346,6 @@
         justify-content: center;
     }
 
-    .table__status {
-        position: absolute;
-        font-size: 2em;
-        font-family: var(--second-font);
-        color: var(--light);
-        padding-bottom: var(--extra-large);
-    }
-
     .dealer__card, .player__card {
         padding: var(--small);
         height: 63%;
@@ -392,4 +416,13 @@
         color: var(--light);
         background-color: var(--dark);
     } 
+
+    .table__status {
+        position: absolute;
+        font-size: 2em;
+        font-family: var(--second-font);
+        color: var(--light);
+        padding-bottom: var(--extra-large);
+    }
+
 </style>
