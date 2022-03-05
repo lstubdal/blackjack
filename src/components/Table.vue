@@ -199,8 +199,18 @@
                 cardList.forEach(card => {
                     if (card.value === 'JACK' || card.value === 'QUEEN' || card.value === 'KING') {
                         totalSum += 10
-                    } else if (card.value === 'ACE' && cardList.length >= 2) {
-                        totalSum += 11
+
+                        /* ace conditions */
+                    } else if (card.value === 'ACE' && cardList.length >= 2) {  /* if ace and not default table */
+                        if ((totalSum + 11) > 21) {
+                            totalSum += 1
+                            console.log('totalsum 1', totalSum);
+                        } else {
+                            totalSum += 11;
+                            console.log('totalsum 11', totalSum);
+                        }      
+                        
+                        
                     } else {
                         const valueAsNumer = parseInt(card.value);  /* parse value from API to number in order to add sum */
                         totalSum += valueAsNumer;
@@ -244,9 +254,6 @@
                 // reset deckId variable
                 // reset players cards arrays
             },
-            test() {
-                console.log('clicked')
-            }
         }
     }
 </script>
