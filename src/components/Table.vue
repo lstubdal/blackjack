@@ -11,7 +11,7 @@
             <img src="/images/exit.svg" alt="exit" class="table__exit">
         </RouterLink>
 
-        <h2 class="table__participants table__participants--dealer">{{ participants[0] }} 
+        <h2 class="table__participants table__participants--dealer"> DEALER
             <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
         </h2>
 
@@ -30,7 +30,7 @@
 
         <div class="table__status">{{ getStatusOfGame }}</div>
 
-        <h2 class="table__participants table__participants--you">{{ participants[1] }}
+        <h2 class="table__participants table__participants--you"> YOU
             <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
         </h2>
 
@@ -53,13 +53,10 @@
     export default {
         data() {
             return {
-                participants: ['DEALER', 'YOU'],
-                gameStatus: '',
                 deckId: '',
+                gameStatus: '',
                 dealersCards: [],
                 playersCards: [],
-                dealersTotalSum: 0,
-                playersTotalSum: 0,
                 remainingCards: '',
                 gameDone: false,
                 playerDone: false,
@@ -124,10 +121,14 @@
                     if (this.totalSum(this.dealersCards) > this.totalSum(this.playersCards)) {
                         this.gameFinished();
                         return this.gameStatus = 'Dealer is closest to 21 and wins!';
+
+                    } else if (this.totalSum(this.dealersCards) === this.totalSum(this.playersCards)) {
+                        return this.gameStatus = 'Equal score, nobody wins'
+
                     } else {
                         this.gameFinished();
                         return this.gameStatus = 'Congrats, you are closest to 21 and win!';
-                    }
+                    }   
                 }
 
                 return this.gameStatus = 'None has Black Jack yet'; 
@@ -223,13 +224,13 @@
             playerFinished() {
                 setTimeout(() => {
                     this.playerDone = !this.playerDone; 
-                }, 1000);
+                }, 300);
             },
 
             gameFinished() {
                 setTimeout(() => {
                     this.gameDone = !this.gameDone; 
-                }, 1000);
+                }, 800);
             },
 
             newGame() {
