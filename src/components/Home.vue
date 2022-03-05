@@ -46,6 +46,7 @@
         color: var(--main-color);
         font-size: 7em;
         font-family: var(--main-font);
+        text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
     }
 
     .home__button {
