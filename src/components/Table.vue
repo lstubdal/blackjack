@@ -2,8 +2,8 @@
     <div class="table"> 
         <div class="table__game-finished" v-if="gameDone">
             <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
-            <RouterLink :to="{ name: 'home'}">
-                <button class="table__game-finished-button">PLAY AGAIN</button>
+            <RouterLink :to="{ name: 'home' }">
+                <button @clicked="test" class="table__game-finished-button">PLAY AGAIN</button>
             </RouterLink>
         </div>
 
@@ -12,7 +12,7 @@
         </RouterLink>
 
         <h2 class="table__participants table__participants--dealer">{{ participants[0] }} 
-            <div  class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> <!-- v-if="!playerDone" -->
+            <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
         </h2>
 
         <div class="dealer">
@@ -126,7 +126,7 @@
                         return this.gameStatus = 'Dealer is closest to 21 and wins!';
                     } else {
                         this.gameFinished();
-                        return this.gameStatus = 'Congrats, you are closest to 21 and wins!';
+                        return this.gameStatus = 'Congrats, you are closest to 21 and win!';
                     }
                 }
 
@@ -242,6 +242,9 @@
                 //get a new deck of cards
                 // reset deckId variable
                 // reset players cards arrays
+            },
+            test() {
+                console.log('clicked')
             }
         }
     }
@@ -271,6 +274,8 @@
     }
 
     .table__game-finished-button {
+        position: absolute;
+        z-index: 1;
         width: 350px;
         height: 80px;
         font-family: var(--main-font);
@@ -279,13 +284,23 @@
         border: none;
         border-radius: var(--corner-radius);
         padding: var(--small);
+        margin-left: -12%;
+        cursor: pointer;
+    }
+
+    .table__game-finished-button:hover {
+        color: var(--main-color);
+        background: var(--dark);
+        border: 2px solid var(--main-color);
     }
 
     .table__game-finished-status {
+        position: absolute;
         font-size: 3em;
         font-family: var(--second-font);
+        font-weight: 1000;
         color: var(--light);
-        padding-bottom: var(--large);
+        padding-bottom: 200px;
     }
 
     .table__exit {
@@ -296,6 +311,7 @@
 
     .table__participants {
         position: absolute;
+        z-index: 2;
         font-size: 3.5em;
         font-family: var(--main-font);
         color: var(--main-color);
@@ -424,5 +440,4 @@
         color: var(--light);
         padding-bottom: var(--extra-large);
     }
-
 </style>
