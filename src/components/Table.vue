@@ -28,7 +28,7 @@
             <div class="table__deck-text">cards left</div>
         </div>
 
-        <div class="table__status">{{ getStatusOfGame }}</div>
+        <div class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</div>
 
         <h2 class="table__participants table__participants--you"> YOU
             <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
