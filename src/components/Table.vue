@@ -60,6 +60,7 @@
                 remainingCards: '',
                 gameDone: false,
                 playerDone: false,
+                clicked: false
             }
         },
 
@@ -448,5 +449,30 @@
         font-family: var(--second-font);
         color: var(--light);
         padding-bottom: var(--extra-large);
+    }
+
+    /********* RESPONSIVE TABLET ***********/         
+    @media screen and (min-width: 768px) {
+        .table__deck {
+           height: 180px;
+           width: 140px;
+        }
+
+        .table__participants {
+            font-size: 2.5em;
+        }
+
+        .table__sum {
+            font-size: 0.8em;
+            width: 150px;
+        }
+
+        .table__game-finished-button {
+            margin-left: -17%;
+        }
+
+        .table__game-finished-status {
+            font-size: 2.2em;
+        }
     }
 </style>
