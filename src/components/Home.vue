@@ -3,7 +3,7 @@
         <p class="home__headline"> {{ headline }} </p>
         <h1 class="home__title"> {{ title }} </h1>
 
-        <button class="home__button" @click="startGame">START GAME</button>     
+        <button :class="{'home__button': !clicked, 'home__button--clicked' : clicked}" @click="startGame">START GAME</button>     
     </div>
 </template>
 
@@ -13,11 +13,13 @@
             return {
                 headline: "Let's play",
                 title: 'BLACK JACK',  
+                clicked: false
             }
         },
 
         methods: {
             startGame() {
+                this.clicked = !this.clicked;
                 this.$router.push('table');
             },
         }
@@ -61,7 +63,7 @@
         margin: 5%;
     }
 
-    .home__button:hover {
+    .home__button:hover, .home__button--clicked {
         color: var(--light);
         background-color: var(--dark);
     }
