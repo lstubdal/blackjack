@@ -1,11 +1,26 @@
 To Do:
-- pick card
-- stay
-- turn dealers first card around => stay from player then turn
+
+- responsive 
+- if both same - CHECK
+- fix semantic tags
+- fix bem
+- new game instead of start game routing
+
+
+?
 - hover over exit => write exit
-- !gameFinished = true => layover w. delay
+- setup table better code?
+
 
 
 EXTRA FEATURES
 - add several players
 - add scoreboard
+- add cash
+
+
+ace
+
+ace = 11 
+ace + sum = > 21 = 1
+ace ace = 11 + 1
