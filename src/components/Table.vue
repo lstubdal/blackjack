@@ -123,6 +123,7 @@
                         return this.gameStatus = 'Dealer is closest to 21 and wins!';
 
                     } else if (this.totalSum(this.dealersCards) === this.totalSum(this.playersCards)) {
+                        this.gameFinished();
                         return this.gameStatus = 'Equal score, nobody wins'
 
                     } else {
@@ -234,7 +235,7 @@
             playerFinished() {
                 setTimeout(() => {
                     this.playerDone = !this.playerDone; 
-                }, 300);
+                }, 100);
             },
 
             gameFinished() {

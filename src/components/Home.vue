@@ -66,5 +66,21 @@
         background-color: var(--dark);
     }
 
+
+    /********* RESPONSIVE ***********/ 
+    @media screen and (min-width: 768px) {
+        .home__headline {
+            font-size: 2em;
+        }
+
+        .home__title {
+            font-size: 5em;
+        }
+
+        .home__button {
+            width: 30%;
+        }
+    }
+
     
 </style>
