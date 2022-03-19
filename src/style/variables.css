@@ -4,7 +4,7 @@
     --second-font: 'Montserrat', sans-serif;
 
     /* size */
-    --button-size: 1.7em;
+    --button-text: 1.7em;
 
     /* color */
     --background: #19370F;
@@ -20,9 +20,9 @@
     --extra-large: 125px;
 
     /* margin */
-    --side-margin: 75px;
-    --top-large: 100px;
-    --top-small: 10px;
+    --margin-small: 10px;
+    --margin-medium: 75px;
+    --margin-large: 100px;
 
     /* radius */
     --corner-radius: 5px;

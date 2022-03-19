@@ -1,50 +1,57 @@
 <template>
-    <div class="table"> 
-        <div class="table__game-finished" v-if="gameDone">
-            <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
-            <RouterLink :to="{ name: 'home' }">
-                <button @clicked="test" class="table__game-finished-button">PLAY AGAIN</button>
+<!--     <div class="table__game-finished" v-if="gameDone">
+        <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
+        
+        <RouterLink :to="{ name: 'home' }">
+            <button class="table__game-finished-button">PLAY AGAIN</button>
+        </RouterLink>
+    </div> -->
+
+    <div class="table">     
+       <div class="table__score-dealer">
+           <h2 class="table__participants"> DEALER
+               <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
+            </h2>
+
+            <RouterLink :to="{ name: 'home'}">
+                <img src="/images/exit.svg" alt="exit" class="table__exit">
             </RouterLink>
         </div>
 
-        <RouterLink :to="{ name: 'home'}">
-            <img src="/images/exit.svg" alt="exit" class="table__exit">
-        </RouterLink>
-
-        <h2 class="table__participants table__participants--dealer"> DEALER
-            <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
-        </h2>
-
-        <div class="dealer">
-            <div v-if="!playerDone" class="dealer__first-card">dealers hidden card</div>
-            <div class="dealer__cards"  v-for="(card, index) in dealersCards">
-                <img v-if="playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
-                <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">    <!-- kanskje??? :class="`dealer__card + index ${playerDone && index === 0 ? 'dealer__first-card' : ''}`" -->
+        <main class="table__game">
+            <div class="dealer">
+                <div v-if="!playerDone" class="dealer__card--first">dealers hidden card</div>
+                <div class="dealer__cards"  v-for="(card, index) in dealersCards">
+                    <img v-if="playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
+                    <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">    <!-- kanskje??? :class="`dealer__card + index ${playerDone && index === 0 ? 'dealer__first-card' : ''}`" -->
+                </div>
             </div>
-        </div>
 
-        <div class="table__deck">
-            <div class="table__deck-remaining">{{ remainingCards }}</div>
-            <div class="table__deck-text">cards left</div>
-        </div>
+            <div class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</div>
 
-        <div class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</div>
-
-        <h2 class="table__participants table__participants--you"> YOU
-            <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
-        </h2>
-
-        <div class="player">    <!-- section -->
-            <div class="player__cards" v-for="card in playersCards">
-                <img :src="card.image" :alt="card.code" class="player__card">
+            <div class="player">    <!-- section -->
+                <div class="player__cards" v-for="card in playersCards">
+                    <img :src="card.image" :alt="card.code" class="player__card">
+                </div>
             </div>
-        </div>
 
-        <div class="table__buttons">
-            <button class="table__button" @click="drawCard(playersCards)">HIT ME</button>
-            <button class="table__button" @click="dealersTurn">STAY</button>
-        </div>
+            <div class="table__buttons">
+                <button class="table__button" @click="drawCard(playersCards)">HIT ME</button>
+                <button class="table__button" @click="dealersTurn">STAY</button>
+            </div>
+        </main>
 
+        <div class="table__score-player">
+            <div class="table__deck">
+                <div class="table__deck-remaining">{{ remainingCards }}</div>
+                <div class="table__deck-text">cards left</div>
+            </div>
+
+            <h2 class="table__participants"> YOU
+                <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
+            </h2>
+
+        </div>
     </div>
 </template>
 
@@ -212,7 +219,6 @@
                             console.log('totalsum 11', totalSum);
                         }      
                         
-                        
                     } else {
                         const valueAsNumer = parseInt(card.value);  /* parse value from API to number in order to add sum */
                         totalSum += valueAsNumer;
@@ -261,91 +267,60 @@
 </script>
 
 <style>
-    .table {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center; 
-        height: 100vh;
-        width: 100vw;
-    }
 
-    .table__game-finished {
+    .table__game {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        position: absolute;
-        z-index: 2;
-        height: 100vh;
-        width: 100vw;
-        opacity: 98%;
-        background-color: var(--dark);
     }
 
-    .table__game-finished-button {
-        position: absolute;
-        z-index: 1;
-        width: 350px;
-        height: 80px;
-        font-family: var(--main-font);
-        font-size: var(--button-size);
-        background: var(--main-color);
-        border: none;
-        border-radius: var(--corner-radius);
-        padding: var(--small);
-        margin-left: -12%;
-        cursor: pointer;
+    .dealer, .player {
+        display: flex;
+        align-items: center;
     }
 
-    .table__game-finished-button:hover {
-        color: var(--main-color);
-        background: var(--dark);
-        border: 2px solid var(--main-color);
-    }
-
-    .table__game-finished-status {
-        position: absolute;
-        font-size: 3em;
+    .dealer__card--first{       /* covers dealers first card until player hits 'stay' or game over */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 190px;
+        width: 140px;
         font-family: var(--second-font);
-        font-weight: 1000;
+        font-size: 2em;
         color: var(--light);
-        padding-bottom: 200px;
+        background-color: var(--dark);
+        padding: var(--medium);
+        margin: var(--margin-small);
+        border-radius: 8px;
+        border: 2px solid var(--light);
     }
 
-    .table__exit {
-        position: absolute;
-        top: 30;
-        right: 30;
+    .dealer__card, .player__card {
+        padding: var(--small);
+        height: 212px;
+        width: 165px;
     }
 
-    .table__participants {
-        position: absolute;
-        z-index: 2;
-        font-size: 3.5em;
-        font-family: var(--main-font);
-        color: var(--main-color);
+    .table__score-dealer, .table__score-player {
+        display: flex;
+        justify-content: space-between;
     }
 
-    .table__participants--dealer {
-        top: 50;
-        left: var(--side-margin);
+    .table__status {
+        font-size: 2em;
+        font-family: var(--second-font);
+        color: var(--light);
+        padding: var(--medium);
     }
 
-    .table__participants--you {
-        top: 350;
-        right: var(--side-margin);
-    }
-
-    .table__deck {
-        position: absolute;
-        left: var(--side-margin);
+    .table__deck {  
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 220px;
-        width: 160px;
+        height: 210px;
+        width: 150px;
         font-family: var(--main-font);
         font-size: 3.2em;
         color: var(--light);
@@ -354,56 +329,8 @@
     }
 
     .table__deck-text {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
         font-family: var(--second-font);
         font-size: 0.4em;
-    }
-
-    .dealer, .player {
-        display: flex;
-        justify-content: center;
-    }
-
-    .dealer__cards {
-        display: flex;
-        justify-content: center;
-    }
-
-    .dealer__card, .player__card {
-        padding: var(--small);
-        height: 63%;
-    }
-
-    .dealer__first-card{       /* cover dealers first card until player hits 'stay' */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 140px;
-        font-family: var(--second-font);
-        border-radius: 8px;
-        padding: var(--medium);
-        font-size: 2em;
-        height: 190px;
-        color: var(--light);
-        background-color: var(--dark);
-        margin-top: 10px;
-        border: 2px solid var(--light);
-    }
-
-    .table__sum {
-        position: absolute;
-        font-family: var(--second-font);
-        font-size: 0.5em;
-        color: var(--light);
-    }
-
-    .table__buttons {
-        position: absolute;
-        bottom: 40;
-        margin-top: var(--top-large);
     }
 
     .table__button {
@@ -412,11 +339,11 @@
         padding: var(--small);
         font-size: var(--button-text);
         font-family: var(--main-font);
-        cursor: pointer;
-        border-radius: var(--corner-radius);
         background-color: var(--main-color);
+        border-radius: var(--corner-radius);
         border: none;
-        margin: 0px var(--small);
+        margin: var(--medium);
+        cursor: pointer;
     }
     
     .table__button:hover {
@@ -424,55 +351,27 @@
         background-color: var(--dark);
     } 
 
-
-    .table__button {
-        width: 225px;
-        height: 60px;
-        padding: var(--small);
-        font-size: 1.7em;
+    .table__participants {
+        font-size: 3.5em;
         font-family: var(--main-font);
-        cursor: pointer;
-        border-radius: var(--corner-radius);
-        background-color: var(--main-color);
-        border: none;
-        margin: 0px var(--small);
+        color: var(--main-color);
     }
-    
-    .table__button:hover {
-        color: var(--light);
-        background-color: var(--dark);
-    } 
 
-    .table__status {
-        position: absolute;
-        font-size: 2em;
-        font-family: var(--second-font);
-        color: var(--light);
-        padding-bottom: var(--extra-large);
+    .table--responsive {
+        display: none;
     }
+
+  
 
     /********* RESPONSIVE TABLET ***********/         
-    @media screen and (min-width: 768px) {
-        .table__deck {
-           height: 180px;
-           width: 140px;
-        }
+    @media screen and (max-width: 900px) {     
 
-        .table__participants {
-            font-size: 2.5em;
-        }
-
-        .table__sum {
-            font-size: 0.8em;
-            width: 150px;
-        }
-
-        .table__game-finished-button {
-            margin-left: -17%;
-        }
-
-        .table__game-finished-status {
-            font-size: 2.2em;
-        }
     }
+
+     /********* RESPONSIVE MOBILE ***********/ 
+      @media screen and (max-width: 650px) { 
+   
+       
+      }
+
 </style>
