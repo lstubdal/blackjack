@@ -9,8 +9,10 @@
 
     <div class="table">     
        <div class="table__score-dealer">
-           <h2 class="table__participants"> DEALER
-               <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
+           <h2 class="table__participant"> 
+               <span>DEALER</span>
+                <div v-if="!playerDone" class="table__sum">Hidden sum</div>
+                <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
             </h2>
 
             <RouterLink :to="{ name: 'home'}">
@@ -47,11 +49,23 @@
                 <div class="table__deck-text">cards left</div>
             </div>
 
-            <h2 class="table__participants"> YOU
-                <div class="table__sum">Sum: {{  totalSum(playersCards) }} </div>
+            <h2 class="table__participant"> 
+                <span>YOU</span>
+                <span class="table__sum">Sum: {{  totalSum(playersCards) }} </span>
             </h2>
-
         </div>
+
+     <!--    <div class="table__score-player--responsive">
+            <div class="table__deck">
+                <div class="table__deck-remaining">{{ remainingCards }}</div>
+                <div class="table__deck-text">cards left</div>
+            </div>
+
+            <h2 class="table__participant"> 
+                <span>YOU</span>
+                <span class="table__sum">Sum: {{  totalSum(playersCards) }} </span>
+            </h2>
+        </div> -->
     </div>
 </template>
 
@@ -268,11 +282,20 @@
 
 <style>
 
+    .table {
+        height: 100vh;
+        width: 100vw;
+       /*  display: flex;
+        flex-direction: column;
+        justify-content: space-between; */
+    }
+
     .table__game {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        margin-top: -1%;
     }
 
     .dealer, .player {
@@ -305,6 +328,26 @@
     .table__score-dealer, .table__score-player {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        padding: var(--small);
+    }
+
+    .table__score-player {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        bottom: 35%;
+        padding: var(--medium);
+    }
+
+    .table__score-player--responsive {
+        visibility: hidden;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        bottom: 180;
+        padding: var(--medium);
     }
 
     .table__status {
@@ -319,8 +362,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 210px;
-        width: 150px;
+        height: 200px;
+        width: 140px;
         font-family: var(--main-font);
         font-size: 3.2em;
         color: var(--light);
@@ -333,6 +376,10 @@
         font-size: 0.4em;
     }
 
+    .table__buttons {
+        display: flex;
+    }
+
     .table__button {
         width: 225px;
         height: 60px;
@@ -342,7 +389,7 @@
         background-color: var(--main-color);
         border-radius: var(--corner-radius);
         border: none;
-        margin: var(--medium);
+        margin: var(--medium) var(--small);
         cursor: pointer;
     }
     
@@ -351,27 +398,98 @@
         background-color: var(--dark);
     } 
 
-    .table__participants {
-        font-size: 3.5em;
+    .table__participant {
+        display: flex;
+        flex-direction: column;
+        font-size: 2.7em;
         font-family: var(--main-font);
         color: var(--main-color);
+        padding: var(--medium);
     }
 
-    .table--responsive {
-        display: none;
+    .table__exit {
+        padding: var(--medium);
     }
 
-  
-
-    /********* RESPONSIVE TABLET ***********/         
-    @media screen and (max-width: 900px) {     
-
+    .table__sum {
+        font-family: var(--second-font);
+        font-size: 0.5em;
+        color: var(--light);
     }
 
-     /********* RESPONSIVE MOBILE ***********/ 
-      @media screen and (max-width: 650px) { 
-   
-       
-      }
+
+    /********* RESPONSIVE ***********/         
+    @media screen and (max-width: 900px) { 
+
+        .table__game {
+            margin-top: 20%;
+        }
+
+        .table__deck {
+            position: absolute;
+            flex-direction: row;
+            justify-content: space-evenly;
+            font-size: 1.5em;
+            background-color: transparent;
+            height: 0%;
+            left: 10;    
+        }
+
+        .table__deck-text {
+            font-size: 0.8em;
+            background-color: none;
+        } 
+
+        .table__participant {
+            align-items: center;
+            flex-direction: row;
+            font-size: 1.8em;
+            color: var(--light);
+        }
+
+        .table__score-dealer, .table__score-player {
+            height: 50px;
+            background-color: var(--dark);
+            padding: 4%;
+        }
+
+        .table__score-dealer {
+            margin-bottom: 3%;
+        }
+
+        .table__score-player {
+            bottom: 0;
+            justify-content: flex-end;
+        }
+
+        .dealer__card, .player__card {
+            padding: var(--small);
+            height: 190px;
+            width: 150px;
+        }
+
+        .dealer__card--first {
+            height: 170px;
+            width: 125px;
+           
+        }
+
+        .table__sum {
+            padding-left: var(--small);
+            font-size: 0.8em;
+        }
+    }
+
+    @media screen and (max-width: 650px) { 
+        .table__buttons {
+            margin: var(--medium);
+            flex-direction: column;
+        }
+
+        .table__button {
+            margin: var(--small);
+        }
+    
+    }
 
 </style>
