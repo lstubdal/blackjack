@@ -1,11 +1,11 @@
 <template>
-<!--     <div class="table__game-finished" v-if="gameDone">
+    <div class="table__game-finished" v-if="gameDone">
         <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
         
         <RouterLink :to="{ name: 'home' }">
             <button class="table__game-finished-button">PLAY AGAIN</button>
         </RouterLink>
-    </div> -->
+    </div>
 
     <div class="table">     
        <div class="table__score-dealer">
@@ -281,21 +281,12 @@
 </script>
 
 <style>
-
-    .table {
-        height: 100vh;
-        width: 100vw;
-       /*  display: flex;
-        flex-direction: column;
-        justify-content: space-between; */
-    }
-
     .table__game {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin-top: -1%;
+        margin-top: -5%;
     }
 
     .dealer, .player {
@@ -417,12 +408,51 @@
         color: var(--light);
     }
 
+    .table__game-finished {
+        position: absolute; /* for layover effect */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+        height: 100vh;
+        width: 100vw;
+        opacity: 98%;   /* fix with rgba */
+        background-color: var(--dark);
+    }
+
+    .table__game-finished-button {
+        z-index: 1;
+        width: 350px;
+        height: 80px;
+        font-family: var(--main-font);
+        font-size: var(--button-text);
+        background: var(--main-color);
+        border: none;
+        border-radius: var(--corner-radius);
+        padding: var(--small);
+        cursor: pointer;
+    }
+
+    .table__game-finished-button:hover {
+        color: var(--main-color);
+        background: var(--dark);
+        border: 2px solid var(--main-color);
+    }
+
+    .table__game-finished-status {
+        font-size: 3em;
+        font-family: var(--second-font);
+        font-weight: 1000;
+        color: var(--light);
+        padding-bottom: var(--medium);
+    }
+
 
     /********* RESPONSIVE ***********/         
     @media screen and (max-width: 900px) { 
-
         .table__game {
-            margin-top: 20%;
+            margin-top: 15%;
         }
 
         .table__deck {

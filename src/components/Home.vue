@@ -50,7 +50,7 @@
     }
 
     .home__button {
-        width: 20%;
+        width: 30%;
         padding: 25px;
         font-size: 2em;
         font-family: var(--main-font);
@@ -77,7 +77,7 @@
         }
 
         .home__button {
-            width: 30%;
+            width: 40%;
         }
     }
 </style>
