@@ -512,6 +512,11 @@
         .table__button {
             margin: var(--small);
         }
+
+        .table__score-player {
+            position: fixed;
+            bottom: 0;
+        }
     
     }
 
