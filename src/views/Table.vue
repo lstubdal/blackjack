@@ -1,18 +1,16 @@
 <template>
     <div class="table__game-finished" v-if="gameDone">
-        <p class="table__game-finished-status">{{ getStatusOfGame }}</p>
-        
-        <RouterLink :to="{ name: 'home' }">
-            <button class="table__game-finished-button">PLAY AGAIN</button>
-        </RouterLink>
+        <span class="table__game-finished-status">{{ getStatusOfGame }}</span>
+
+        <button class="table__game-finished-button" @click="newGame">PLAY AGAIN</button> 
     </div>
 
-    <div class="table">     
+    <div v-else class="table">     
        <div class="table__score-dealer">
            <h2 class="table__participant"> 
                <span>DEALER</span>
-                <div v-if="!playerDone" class="table__sum">Hidden sum</div>
-                <div v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</div>       <!-- show dealers sum if player hit stay --> 
+                <span v-if="!playerDone" class="table__sum">Hidden sum</span>
+                <span v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</span>      <!-- show dealers sum if player hit stay --> 
             </h2>
 
             <RouterLink :to="{ name: 'home'}">
@@ -23,15 +21,16 @@
         <main class="table__game">
             <div class="dealer">
                 <div v-if="!playerDone" class="dealer__card--first">dealers hidden card</div>
-                <div class="dealer__cards"  v-for="(card, index) in dealersCards">
+
+                <div v-else class="dealer__cards"  v-for="(card, index) in dealersCards">
                     <img v-if="playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
-                    <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">    <!-- kanskje??? :class="`dealer__card + index ${playerDone && index === 0 ? 'dealer__first-card' : ''}`" -->
+                    <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">   
                 </div>
             </div>
 
-            <div class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</div>
+            <span class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</span>
 
-            <div class="player">    <!-- section -->
+            <div class="player">    
                 <div class="player__cards" v-for="card in playersCards">
                     <img :src="card.image" :alt="card.code" class="player__card">
                 </div>
@@ -45,8 +44,8 @@
 
         <div class="table__score-player">
             <div class="table__deck">
-                <div class="table__deck-remaining">{{ remainingCards }}</div>
-                <div class="table__deck-text">cards left</div>
+                <span class="table__deck-remaining">{{ remainingCards }}</span>
+                <span class="table__deck-text">cards left</span>
             </div>
 
             <h2 class="table__participant"> 
@@ -54,18 +53,6 @@
                 <span class="table__sum">Sum: {{  totalSum(playersCards) }} </span>
             </h2>
         </div>
-
-     <!--    <div class="table__score-player--responsive">
-            <div class="table__deck">
-                <div class="table__deck-remaining">{{ remainingCards }}</div>
-                <div class="table__deck-text">cards left</div>
-            </div>
-
-            <h2 class="table__participant"> 
-                <span>YOU</span>
-                <span class="table__sum">Sum: {{  totalSum(playersCards) }} </span>
-            </h2>
-        </div> -->
     </div>
 </template>
 
@@ -81,12 +68,15 @@
                 remainingCards: '',
                 gameDone: false,
                 playerDone: false,
-                clicked: false
+                clicked: false,
+                playAgainClicked: false
             }
         },
 
         created() {
-            this.setUpTable();
+            if (!this.playAgainClicked) {
+                this.setUpTable();
+            }
         },
 
         computed: {
@@ -160,7 +150,6 @@
 
         methods: {
             async setUpTable() {
-
                 /* fetch a new deck of cards with unique id */
                 const url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
                 const response = await fetch(url);
@@ -173,15 +162,18 @@
                 const defaultCardsResponse = await fetch(defaultCardsUrl);
                 const data = await defaultCardsResponse.json();
 
+                // give value by index instead of push to replacecards when player clicks 'play again' (new fetch)
+
                 /* add two cards to dealer */
-                this.dealersCards.push(data.cards[0]);
-                this.dealersCards.push(data.cards[1]);
+                this.dealersCards[0] = data.cards[0];
+                this.dealersCards[1] = data.cards[1];
 
                 /* add two cards to player */
-                this.playersCards.push(data.cards[2]);
-                this.playersCards.push(data.cards[3]);
+                this.playersCards[0] = data.cards[2];
+                this.playersCards[1] = data.cards[3];
 
                 this.remainingCards = data.remaining;
+        
             },
 
             async drawCard(cardList) {
@@ -266,15 +258,16 @@
             },
 
             newGame() {
-                
-                /* this.setUpTable() */
-            },
+                // reset game values
+                this.playAgainClicked = true;
+                this.playerDone = false;
+                this.gameDone = false;
 
-            exit() {
-                // reset game
-                //get a new deck of cards
-                // reset deckId variable
-                // reset players cards arrays
+                // remove drawn cards from previous game
+                this.playersCards.length = 2;
+                this.dealersCards.length = 2;
+                
+                this.setUpTable(); // set up table again
             },
         }
     }
