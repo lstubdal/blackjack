@@ -1,7 +1,15 @@
-import TableView from './views/TableView.vue';
-import HomeView from './views/HomeView.vue';
+import Table from './views/Table.vue';
+import Home from './views/Home.vue';
 
 export default [
-	{ name: 'home', 				path: '/', 					component: HomeView },
-	{ name: 'tableview', 			path: '/table', 			component: TableView },
+	{ 
+		name: 'home',
+		path: '/', 					
+		component: Home 
+	},
+	{ 
+		name: 'table', 			
+		path: '/table', 			
+		component: Table 
+	}
 ]
