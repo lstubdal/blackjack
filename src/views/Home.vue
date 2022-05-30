@@ -3,7 +3,7 @@
         <p class="home__headline"> {{ headline }} </p>
         <h1 class="home__title"> {{ title }} </h1>
 
-        <button class="home__button" @click="startGame">START GAME</button>     
+        <RouterLink :to="{name: 'table'}" class="home__link" @click="startGame">START GAME</RouterLink>     
     </div>
 </template>
 
@@ -14,12 +14,6 @@
                 headline: "Let's play",
                 title: 'BLACK JACK',  
             }
-        },
-
-        methods: {
-            startGame() {
-                this.$router.push('table');
-            },
         }
     }
 </script>
@@ -49,19 +43,24 @@
         text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
     }
 
-    .home__button {
+    .home__link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 30%;
-        padding: 25px;
         font-size: 2em;
         font-family: var(--main-font);
+        color: var(--dark);
         background-color: var(--main-color);
         border-radius: var(--corner-radius);
         border: none;
+        text-decoration: none;
         cursor: pointer;
+        padding: 25px;
         margin: 5%;
     }
 
-    .home__button:hover, .home__button--clicked {
+    .home__link:hover, .home__link--clicked {
         color: var(--light);
         background-color: var(--dark);
     }
@@ -76,7 +75,7 @@
             font-size: 5em;
         }
 
-        .home__button {
+        .home__link {
             width: 40%;
         }
     }
