@@ -1,7 +1,6 @@
 <template>
     <div class="table__game-finished" v-if="gameDone">
         <span class="table__game-finished-status">{{ getStatusOfGame }}</span>
-
         <button class="table__game-finished-button" @click="newGame">PLAY AGAIN</button> 
     </div>
 
@@ -69,7 +68,8 @@
                 gameDone: false,
                 playerDone: false,
                 clicked: false,
-                playAgainClicked: false
+                playAgainClicked: false,
+                error: ''
             }
         },
 
@@ -83,18 +83,7 @@
             getStatusOfGame() {
                 /* check blackjack by default */
                 if (this.dealersCards.length === 2 && this.dealersCards.length === 2) {
-                    if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
-                    this.playerFinished();
-                    this.gameFinished();
-                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
-
-                    } else {
-                        if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21) {
-                        this.playerFinished();
-                        this.gameFinished();
-                        return this.gameStatus = 'BLACK JACK! Congrats, you win';
-                        }
-                    }
+                    this.checkBlackJackByDefault();
                 } 
 
                 /* check black jack  */
@@ -153,6 +142,8 @@
                 /* fetch a new deck of cards with unique id */
                 const url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
                 const response = await fetch(url);
+
+
                 const { deck_id } = await response.json();
 
                 this.deckId = deck_id;
@@ -160,38 +151,71 @@
                 /* draw four cards from deck for default table */
                 const defaultCardsUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=4`;
                 const defaultCardsResponse = await fetch(defaultCardsUrl);
-                const data = await defaultCardsResponse.json();
 
-                // give value by index instead of push to replacecards when player clicks 'play again' (new fetch)
+                try {
+                    await this.handleResponseDefaultCard(defaultCardsResponse);
+                } catch(error) {
+                    this.error = error.message
+                }
+            },
 
-                /* add two cards to dealer */
-                this.dealersCards[0] = data.cards[0];
-                this.dealersCards[1] = data.cards[1];
+            async handleResponseDefaultCard(defaultCardsResponse) {
+                if (defaultCardsResponse.ok) {
+                    const data = await defaultCardsResponse.json();
+                    // give value by index instead of push to replacecards when player clicks 'play again' (new fetch)
+                    /* add two cards to dealer */
+                    this.dealersCards[0] = data.cards[0];
+                    this.dealersCards[1] = data.cards[1];
 
-                /* add two cards to player */
-                this.playersCards[0] = data.cards[2];
-                this.playersCards[1] = data.cards[3];
+                    /* add two cards to player */
+                    this.playersCards[0] = data.cards[2];
+                    this.playersCards[1] = data.cards[3];
 
-                this.remainingCards = data.remaining;
-        
+                    this.remainingCards = data.remaining;
+                } else {
+                    if (response.status === 404) {
+                        throw new Error("Can't find url")
+                    } else if (response.status === 500) {
+                        throw new Error("Server error")
+                    } else {
+                        throw new Error("something went wrong");
+                    }
+                }
             },
 
             async drawCard(cardList) {
                 const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
                 const drawResponse = await fetch(drawUrl);
-                const cardData = await drawResponse.json();
-                
-                /* add card to correct list */
-                if (cardList === this.dealersCards) {
-                    this.dealersCards.push(cardData.cards[0]);
-                    console.log('dealer trekker kort')
+
+                try {
+                    await this.handleResponseDrawCard(drawResponse, cardList);
+                } catch(error) {
+                    this.error = error.message
+                } 
+            },
+
+            async handleResponseDrawCard(drawResponse, cardList) {
+                if (drawResponse.ok) {
+                    const cardData = await drawResponse.json();
+
+                    /* add card to correct list */
+                    if (cardList === this.dealersCards) {
+                        this.dealersCards.push(cardData.cards[0]);
+                    } else {
+                        if (cardList === this.playersCards) {
+                            this.playersCards.push(cardData.cards[0]);
+                        }
+                    }
+                    return this.remainingCards = cardData.remaining;       /* update remaining cards in stack*/
                 } else {
-                    if (cardList === this.playersCards) {
-                        this.playersCards.push(cardData.cards[0]);
-                        console.log('spiller trekker kort');
+                    if (response.status === 404) {
+                        throw new Error("Can't find url")
+                    } else if (response.status === 500) {
+                        throw new Error("Server error")
+                    } else {
+                        throw new Error("something went wrong");
                     }
                 }
-                this.remainingCards = cardData.remaining;       /* update remaining cards in stack*/
             },
 
             async dealersTurn() {
@@ -207,6 +231,21 @@
                         console.log('dealer ferdig');
                     }
                }     
+            },
+
+            checkBlackJackByDefault() {
+                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
+                    this.playerFinished();
+                    this.gameFinished();
+                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
+
+                } else {
+                    if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21) {
+                    this.playerFinished();
+                    this.gameFinished();
+                    return this.gameStatus = 'BLACK JACK! Congrats, you win';
+                    }
+                }
             },
 
             totalSum(cardList) { 
@@ -517,7 +556,5 @@
             position: fixed;
             bottom: 0;
         }
-    
     }
-
 </style>
