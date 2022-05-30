@@ -83,7 +83,19 @@
             getStatusOfGame() {
                 /* check blackjack by default */
                 if (this.dealersCards.length === 2 && this.dealersCards.length === 2) {
-                    this.checkBlackJackByDefault();
+                    /* this.checkBlackJackByDefault(); */
+                    if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
+                    this.playerFinished();
+                    this.gameFinished();
+                    return this.gameStatus = 'BLACK JACK! Dealer wins...';
+
+                } else {
+                    if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21) {
+                        this.playerFinished();
+                        this.gameFinished();
+                        return this.gameStatus = 'BLACK JACK! Congrats, you win';
+                        }
+                    }
                 } 
 
                 /* check black jack  */
@@ -132,7 +144,6 @@
                         return this.gameStatus = 'Congrats, you are closest to 21 and win!';
                     }   
                 }
-
                 return this.gameStatus = 'None has Black Jack yet'; 
             },
         },
@@ -143,10 +154,22 @@
                 const url = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
                 const response = await fetch(url);
 
-
-                const { deck_id } = await response.json();
-
-                this.deckId = deck_id;
+                try {
+                    if (response.ok) {
+                        const { deck_id } = await response.json();
+                        this.deckId = deck_id;
+                    } else {
+                        if (response.status === 404) {
+                            throw new Error("Can't find url")
+                        } else if (response.status === 500) {
+                            throw new Error("Server error")
+                        } else {
+                            throw new Error("something went wrong");
+                        }
+                    }
+                } catch (error) {
+                    this.error = error.message;
+                }
 
                 /* draw four cards from deck for default table */
                 const defaultCardsUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=4`;
@@ -280,17 +303,15 @@
                 }
             },
 
-            updateGameStatus(newUpdate) {
-                this.gameStatus = newUpdate;
-            },
-
             playerFinished() {
+                // show dealers points
                 setTimeout(() => {
                     this.playerDone = !this.playerDone; 
                 }, 100);
             },
 
             gameFinished() {
+                // wait to show new game overlay, for user to se full table with points
                 setTimeout(() => {
                     this.gameDone = !this.gameDone; 
                 }, 800);
