@@ -3,11 +3,11 @@
         <span class="table__game-finished-status">{{ getStatusOfGame }}</span>
         <button class="table__game-finished-button" @click="newGame">PLAY AGAIN</button> 
     </div>
-
+    
     <div v-else class="table">     
-       <div class="table__score-dealer">
-           <h2 class="table__participant"> 
-               <span>DEALER</span>
+        <div class="table__score-dealer">
+            <h2 class="table__participant">
+                <span>DEALER</span>
                 <span v-if="!playerDone" class="table__sum">Hidden sum</span>
                 <span v-if="playerDone" class="table__sum">Sum: {{  totalSum(dealersCards) }}</span>      <!-- show dealers sum if player hit stay --> 
             </h2>
@@ -18,22 +18,22 @@
         </div>
 
         <main class="table__game">
-            <div class="dealer">
+            <section class="dealer">
                 <div v-if="!playerDone" class="dealer__card--first">dealers hidden card</div>
 
                 <div v-else class="dealer__cards"  v-for="(card, index) in dealersCards">
                     <img v-if="playerDone && index === 0" :src="card.image" :alt="card.code" class="dealer__card">
                     <img v-if="index > 0" :src="card.image" :alt="card.code" class="dealer__card">   
                 </div>
-            </div>
+            </section>
 
             <span class="table__status" v-if="!gameDone">{{ getStatusOfGame }}</span>
 
-            <div class="player">    
+            <section class="player">    
                 <div class="player__cards" v-for="card in playersCards">
                     <img :src="card.image" :alt="card.code" class="player__card">
                 </div>
-            </div>
+            </section>
 
             <div class="table__buttons">
                 <button class="table__button" @click="drawCard(playersCards)">HIT ME</button>
@@ -41,7 +41,7 @@
             </div>
         </main>
 
-        <div class="table__score-player">
+        <section class="table__score-player">
             <div class="table__deck">
                 <span class="table__deck-remaining">{{ remainingCards }}</span>
                 <span class="table__deck-text">cards left</span>
@@ -51,12 +51,11 @@
                 <span>YOU</span>
                 <span class="table__sum">Sum: {{  totalSum(playersCards) }} </span>
             </h2>
-        </div>
+        </section>
     </div>
 </template>
 
 <script>
-    
     export default {
         data() {
             return {
@@ -74,6 +73,7 @@
         },
 
         created() {
+            // default table setup for first round
             if (!this.playAgainClicked) {
                 this.setUpTable();
             }
@@ -98,23 +98,26 @@
                     }
                 } 
 
-                /* check black jack  */
+                /* check blackjack  dealer */
                if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) !== 21 ) {
                     this.playerFinished();
                     this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Dealer wins...';
                 
+                /* check blackjack player */
                 } else if (this.totalSum(this.dealersCards) !== 21 &&  this.totalSum(this.playersCards) === 21 ) {
                     this.playerFinished();
                     this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Congrats, you win';
 
+                /* handle if both have blackjack */
                 } else if (this.totalSum(this.dealersCards) === 21 &&  this.totalSum(this.playersCards) === 21) {
                     this.playerFinished();
                     this.gameFinished();
                     return this.gameStatus = 'BLACK JACK! Both have 21, but dealer still wins...';
 
-                } else { /* check if anyone is busted */
+                /* check if anyone is busted */
+                } else { 
                     if (this.totalSum(this.dealersCards) > 21 ) {
                        this.playerFinished();
                        this.gameFinished(); 
@@ -129,7 +132,7 @@
                     }
                 }
 
-                /* check winner when no one has blackjack or busted */
+                /* check who's winner when no one has blackjack or busted */
                 if (this.playerDone && this.totalSum(this.dealersCards) < 21 && this.totalSum(this.playersCards) < 21) {
                     if (this.totalSum(this.dealersCards) > this.totalSum(this.playersCards)) {
                         this.gameFinished();
@@ -171,7 +174,7 @@
                     this.error = error.message;
                 }
 
-                /* draw four cards from deck for default table */
+                /* draw four cards from deck for default table setup */
                 const defaultCardsUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=4`;
                 const defaultCardsResponse = await fetch(defaultCardsUrl);
 
@@ -185,7 +188,6 @@
             async handleResponseDefaultCard(defaultCardsResponse) {
                 if (defaultCardsResponse.ok) {
                     const data = await defaultCardsResponse.json();
-                    // give value by index instead of push to replacecards when player clicks 'play again' (new fetch)
                     /* add two cards to dealer */
                     this.dealersCards[0] = data.cards[0];
                     this.dealersCards[1] = data.cards[1];
@@ -193,8 +195,9 @@
                     /* add two cards to player */
                     this.playersCards[0] = data.cards[2];
                     this.playersCards[1] = data.cards[3];
+                    // give value by index instead of push to replacecards when player clicks 'play again' (new fetch)
 
-                    this.remainingCards = data.remaining;
+                    this.remainingCards = data.remaining; //update remaing cards in deck
                 } else {
                     if (response.status === 404) {
                         throw new Error("Can't find url")
@@ -207,6 +210,7 @@
             },
 
             async drawCard(cardList) {
+                // fetch 1 card from current deck each time player clicks 'hit me'
                 const drawUrl = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`;
                 const drawResponse = await fetch(drawUrl);
 
@@ -245,13 +249,12 @@
                 this.playerFinished();
 
                 if (this.playerDone ) {
+                    // if player is done and dealer total sum under 17, it must draw a card
                     while (this.totalSum(this.dealersCards) < 17 ) {
-                       this.totalSum(this.dealersCards)                 /* call on function to update sum  */
+                       this.totalSum(this.dealersCards)                
 
                        await this.drawCard(this.dealersCards);
                        this.gameStatus = 'Dealer trekker har trukket kort';
-                       
-                        console.log('dealer ferdig');
                     }
                }     
             },
@@ -281,10 +284,8 @@
                     } else if (card.value === 'ACE' && cardList.length >= 2) {  /* if ace and not default table */
                         if ((totalSum + 11) > 21) {
                             totalSum += 1
-                            console.log('totalsum 1', totalSum);
                         } else {
                             totalSum += 11;
-                            console.log('totalsum 11', totalSum);
                         }      
                         
                     } else {
